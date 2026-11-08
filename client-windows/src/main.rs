@@ -103,6 +103,7 @@ enum Command {
         stop_event: Option<String>,
         #[arg(long)]
         fx2_firmware: Option<PathBuf>,
+        /// Device port, or tcp:<local port> for the experimental Linux bridge.
         #[arg(long, default_value = "auto")]
         port: String,
         #[arg(long, default_value_t = 2_000_000)]

@@ -11,6 +11,8 @@ ROOT_FILES = {
     'client-windows/Cargo.toml', 'client-windows/Cargo.lock',
     'client-windows/README.md', 'client-windows/input.example.json',
     'client-windows/run.ps1',
+    'bridge-linux/bridge.py', 'bridge-linux/README.md', 'bridge-linux/LICENSE',
+    'bridge-linux/test_bridge.py',
     'firmware/CMakeLists.txt', 'firmware/sdkconfig.defaults',
     'firmware/main/main.c', 'firmware/main/CMakeLists.txt', 'firmware/main/Kconfig.projbuild',
     'firmware-basic/CMakeLists.txt', 'firmware-basic/sdkconfig.defaults',

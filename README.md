@@ -18,6 +18,8 @@ This is an independent project and is not affiliated with Nintendo.
 | ESP32 (Native USB) | ESP32-C5 with native USB; lower USB bandwidth |
 
 Use the firmware for your specific board. Other ESP32 boards require porting.
+For an ESP32-free setup, the [experimental Linux Wi-Fi bridge](bridge-linux/README.md)
+uses a dedicated Wi-Fi adapter and the Windows client's command-line interface.
 You also need your own `prod.keys` and GameShare passphrase; neither is included.
 See [passphrase extraction](docs/PASSPHRASE.md) for supported sources.
 
@@ -43,10 +45,8 @@ See [settings and default controls](client-windows/README.md) and [controller an
 
 ## TODO
 
-- [ ] USB Wi-Fi dongle support as an alternative to the ESP32 bridge.
+- [ ] Validate the [experimental Linux Wi-Fi bridge](bridge-linux/README.md) with a Switch 2 and a compatible Wi-Fi adapter.
 - [ ] Android client.
-
-These features are planned and are not implemented yet.
 
 ## For developers
 
@@ -55,4 +55,4 @@ See the [implementation guide](docs/DEVELOPMENT.md) and [protocol reference](doc
 ## Privacy and license
 
 Keep keys, passphrases and captures private; see [SECURITY.md](SECURITY.md).
-Project-authored code is [MIT licensed](LICENSE). Dependencies retain their [own licenses](THIRD_PARTY_NOTICES.md).
+The Windows client and ESP32 firmware are [MIT licensed](LICENSE). The separate Linux bridge is [GPL-3.0-only](bridge-linux/LICENSE). Dependencies retain their [own licenses](THIRD_PARTY_NOTICES.md).

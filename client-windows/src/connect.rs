@@ -135,6 +135,10 @@ pub fn run_with_hooks(
             "GameShare host not found before scan timeout"
         );
         for (kind, p) in radio.poll()? {
+            ensure!(
+                kind != wire::EVENT || !p.starts_with(b"scan failed"),
+                "bridge could not scan the requested Wi-Fi channels"
+            );
             if kind == wire::PKT && p.len() >= 24 && ldn::is_advertisement(&p[24..]) {
                 let h = Host::decode(&p[24..], p[10], keys)?;
                 if MatchingInfo::decode(&h.app).is_ok() {

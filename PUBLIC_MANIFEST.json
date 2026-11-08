@@ -6,7 +6,7 @@
     },
     {
       "path": ".github/workflows/check.yml",
-      "sha256": "fb575d5e8800fcb7aea1c183d8d364431351b21fb5585b818b8991efa0d6f8a1"
+      "sha256": "2b1d936bcbbefe0da0a0c12a539aa76ab9112ab6e951aa0317ba6a30270f7e68"
     },
     {
       "path": ".gitignore",
@@ -22,7 +22,7 @@
     },
     {
       "path": "README.md",
-      "sha256": "ec02b7561e388574d5ea20142a636db36354128db170488eb3d91bb78dd3f185"
+      "sha256": "f01bea1f58469bd5d9fb05446a5230c7c376146aaf8ca18bd58ca4309b544167"
     },
     {
       "path": "SECURITY.md",
@@ -31,6 +31,22 @@
     {
       "path": "THIRD_PARTY_NOTICES.md",
       "sha256": "a7e84429d159af7b8f54fc9854d9c0ba25fb31aa1ac22bd81c034d85f333cd15"
+    },
+    {
+      "path": "bridge-linux/LICENSE",
+      "sha256": "3972dc9744f6499f0f9b2dbf76696f2ae7ad8af9b23dde66d6af86c9dfb36986"
+    },
+    {
+      "path": "bridge-linux/README.md",
+      "sha256": "0517f9a39a7481d598528662c8acbf99af88fa51fdb0d09fccc6a735694c9c50"
+    },
+    {
+      "path": "bridge-linux/bridge.py",
+      "sha256": "66d4da87e376fc405ba66262e93c8a93e65350da88b3581601a2b3845afa9536"
+    },
+    {
+      "path": "bridge-linux/test_bridge.py",
+      "sha256": "a531bbec8e18daf842dd56251f2fde11301381ccef4480cc46be4fe04b992faf"
     },
     {
       "path": "client-windows/Cargo.lock",
@@ -66,7 +82,7 @@
     },
     {
       "path": "client-windows/src/connect.rs",
-      "sha256": "66ebad1f87f62a4f162c0e2387dd4e171b9d3fc0fc3f415aa09d09e4e1516a6b"
+      "sha256": "53be4da4ab2a4daaf88cca2513b05477ea83dbd7a5ec282d5fe3f30a399a9261"
     },
     {
       "path": "client-windows/src/decoder.rs",
@@ -122,7 +138,7 @@
     },
     {
       "path": "client-windows/src/main.rs",
-      "sha256": "6ca46a63cba70ced84a34a4df8392711e61581ce61c059b7b6b661b1abf88b5e"
+      "sha256": "3b98cccc0dfbfa046a95ca6bd7cb79c8773329672c9783e96a9fcfe565816388"
     },
     {
       "path": "client-windows/src/motion.rs",
@@ -154,7 +170,7 @@
     },
     {
       "path": "client-windows/src/radio.rs",
-      "sha256": "0a5452230da5d2227e130f71daed9c889bdb777c7c654240eb4ccead20b21e9d"
+      "sha256": "ddbb30bf35a6d03d67661479a563279fae7e27b492a7c21833a440b3fc1e0df6"
     },
     {
       "path": "client-windows/src/settings.rs",
@@ -2862,7 +2878,7 @@
     },
     {
       "path": "tools/release/public_files.py",
-      "sha256": "f5742e44b897fa380edc9ab2000e0df6fc77e58b60b264fecd2d125046ee0b06"
+      "sha256": "d9e7cc9d6a207269a2afdfce4166f53fcb6b941e2d8b5f9776cf4d484945419d"
     },
     {
       "path": "tools/release/test_publication.py",

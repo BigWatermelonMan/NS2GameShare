@@ -7,6 +7,7 @@ use std::{
 };
 enum Link {
     Serial(Box<dyn serialport::SerialPort>),
+    Tcp(std::net::TcpStream),
     #[cfg(windows)]
     Fx2(crate::fx2::Device),
 }
@@ -14,6 +15,10 @@ impl Read for Link {
     fn read(&mut self, bytes: &mut [u8]) -> std::io::Result<usize> {
         match self {
             Self::Serial(port) => port.read(bytes),
+            Self::Tcp(stream) => match stream.read(bytes)? {
+                0 => Err(std::io::ErrorKind::UnexpectedEof.into()),
+                count => Ok(count),
+            },
             #[cfg(windows)]
             Self::Fx2(port) => port.read(bytes),
         }
@@ -23,6 +28,7 @@ impl Write for Link {
     fn write(&mut self, bytes: &[u8]) -> std::io::Result<usize> {
         match self {
             Self::Serial(port) => port.write(bytes),
+            Self::Tcp(stream) => stream.write(bytes),
             #[cfg(windows)]
             Self::Fx2(port) => port.write(bytes),
         }
@@ -30,6 +36,7 @@ impl Write for Link {
     fn flush(&mut self) -> std::io::Result<()> {
         match self {
             Self::Serial(port) => port.flush(),
+            Self::Tcp(stream) => stream.flush(),
             #[cfg(windows)]
             Self::Fx2(port) => port.flush(),
         }
@@ -39,6 +46,7 @@ impl Link {
     fn baud_rate(&self) -> Result<u32> {
         match self {
             Self::Serial(port) => Ok(port.baud_rate()?),
+            Self::Tcp(_) => bail!("TCP has no UART baud setting"),
             #[cfg(windows)]
             Self::Fx2(_) => bail!("FX2 has no UART baud setting"),
         }
@@ -46,6 +54,7 @@ impl Link {
     fn set_baud_rate(&mut self, rate: u32) -> Result<()> {
         match self {
             Self::Serial(port) => Ok(port.set_baud_rate(rate)?),
+            Self::Tcp(_) => bail!("TCP has no UART baud setting"),
             #[cfg(windows)]
             Self::Fx2(_) => bail!("FX2 has no UART baud setting"),
         }
@@ -64,6 +73,16 @@ pub struct Radio {
 }
 impl Radio {
     pub fn open(port: &str, baud: u32) -> Result<Self> {
+        if let Some(port) = port.strip_prefix("tcp:") {
+            let port = port.parse::<u16>().context("expected tcp:<local port>")?;
+            let endpoint = std::net::SocketAddr::from(([127, 0, 0, 1], port));
+            let stream = std::net::TcpStream::connect_timeout(&endpoint, Duration::from_secs(2))
+                .context("connecting to local Wi-Fi bridge tunnel")?;
+            stream.set_nodelay(true)?;
+            stream.set_read_timeout(Some(Duration::from_millis(2)))?;
+            stream.set_write_timeout(Some(Duration::from_secs(1)))?;
+            return Ok(Self::from_link(Link::Tcp(stream), baud));
+        }
         #[cfg(windows)]
         if port == "fx2" || port.starts_with("fx2:") {
             let path = port.strip_prefix("fx2:").filter(|s| !s.is_empty());
@@ -136,7 +155,7 @@ impl Radio {
         bytes.push(b'\n');
         self.port
             .write_all(&bytes)
-            .context("serial command write")?;
+            .context("bridge command write")?;
         Ok(())
     }
     pub fn greet(&mut self) -> Result<String> {
@@ -156,7 +175,7 @@ impl Radio {
                 }
             }
         }
-        bail!("device hello timeout at the configured UART rate")
+        bail!("bridge hello timeout")
     }
     pub fn switch_baud(&mut self, baud: u32) -> Result<()> {
         anyhow::ensure!(
@@ -191,8 +210,15 @@ impl Radio {
         let mut b = [0; 16384];
         match self.port.read(&mut b) {
             Ok(n) => Ok(self.decoder.push(&b[..n])),
-            Err(e) if e.kind() == std::io::ErrorKind::TimedOut => Ok(Vec::new()),
-            Err(e) => Err(e).context("serial read"),
+            Err(e)
+                if matches!(
+                    e.kind(),
+                    std::io::ErrorKind::TimedOut | std::io::ErrorKind::WouldBlock
+                ) =>
+            {
+                Ok(Vec::new())
+            }
+            Err(e) => Err(e).context("bridge read"),
         }
     }
     pub fn poll(&mut self) -> Result<Vec<(u8, Vec<u8>)>> {
@@ -232,7 +258,7 @@ impl Radio {
         self.seq = self.seq.wrapping_add(1);
         self.port
             .write_all(&wire::ethernet_tx(eth, self.seq)?)
-            .context("serial Ethernet write")?;
+            .context("bridge Ethernet write")?;
         Ok(())
     }
     pub fn receive_ethernet<'a>(&mut self, p: &'a [u8]) -> Result<&'a [u8]> {

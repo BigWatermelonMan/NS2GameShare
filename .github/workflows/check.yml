@@ -19,6 +19,8 @@ jobs:
           cargo clippy --version
       - run: python -B tools/release/audit_public.py .
       - run: python -B -m unittest discover -s tools/release -p "test_*.py"
+      - run: python -m pip install trio
+      - run: python -B -m unittest discover -s bridge-linux
       - run: cargo fmt --manifest-path client-windows/Cargo.toml -- --check
       - run: cargo test --locked --manifest-path client-windows/Cargo.toml
       - run: cargo clippy --locked --manifest-path client-windows/Cargo.toml --all-targets -- -D warnings
