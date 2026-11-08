@@ -16,6 +16,7 @@ SYNC = b"\xa5\x5a"
 PKT, TEXT, H2D, D2H, EVENT = range(1, 6)
 OUI = b"\x88\xb7"
 VENDOR_IE = bytes.fromhex("dd060022aa100101")
+SCAN_CHANNELS = (1, 6, 11, 36, 40, 44, 48)
 
 
 def encode(kind, payload):
@@ -69,6 +70,34 @@ async def messages(stream):
                     yield line
 
 
+async def scan_radio(phy, channels, dwell, on_frame, on_interface):
+    async with wlan.create_factory() as factory:
+        async with factory.create_monitor(phy, "nsgsmon") as monitor:
+            on_interface(monitor.name(), monitor.index())
+            with monitor._socket:
+                while True:
+                    tuned = False
+                    for channel in channels:
+                        try:
+                            await monitor.set_channel(channel)
+                        except OSError:
+                            continue
+                        tuned = True
+                        with trio.move_on_after(dwell):
+                            while True:
+                                radio = await monitor.recv()
+                                if (radio.flags or 0) & 0x40:  # Bad FCS
+                                    continue
+                                actual = wlan.Frequencies.get(radio.frequency)
+                                if radio.frequency is None:
+                                    actual = channel
+                                frame = radio.data[:-4] if (radio.flags or 0) & 0x10 else radio.data
+                                if actual and advertisement(frame) and await on_frame(frame, actual):
+                                    return
+                    if not tuned:
+                        raise OSError("no usable scan channel")
+
+
 class TargetedStationSocket:
     """Supply GameShare association attributes while reusing LDN's station logic."""
 
@@ -92,7 +121,7 @@ class Bridge:
         self.nursery = nursery
         self.phy = phy
         self.write_lock = trio.Lock()
-        self.channels = [1, 6, 11]
+        self.channels = SCAN_CHANNELS
         self.dwell = 0.2
         self.mac = None
         self.target = None
@@ -121,30 +150,10 @@ class Bridge:
             await self.send(D2H, header + frame)
 
     async def scan(self):
-        async with wlan.create_factory() as factory:
-            async with factory.create_monitor(self.phy, "nsgsmon") as monitor:
-                self.interface = (monitor.name(), monitor.index())
-                with monitor._socket:
-                    while True:
-                        tuned = False
-                        for channel in self.channels:
-                            try:
-                                await monitor.set_channel(channel)
-                            except OSError:
-                                continue
-                            tuned = True
-                            with trio.move_on_after(self.dwell):
-                                while True:
-                                    radio = await monitor.recv()
-                                    if (radio.flags or 0) & 0x40:  # Bad FCS
-                                        continue
-                                    actual = wlan.Frequencies.get(radio.frequency)
-                                    if radio.frequency is None:
-                                        actual = channel
-                                    frame = radio.data[:-4] if (radio.flags or 0) & 0x10 else radio.data
-                                    await self.report_advertisement(frame, actual)
-                        if not tuned:
-                            raise OSError("no usable scan channel")
+        def ready(name, index):
+            self.interface = (name, index)
+
+        await scan_radio(self.phy, self.channels, self.dwell, self.report_advertisement, ready)
 
     async def join(self):
         ssid, bssid, channel, key = self.target
@@ -214,24 +223,10 @@ class Bridge:
                     # delete their temporary interface. Retry after they unwind.
                     try:
                         with trio.move_on_after(3, shield=True):
-                            await self.cleanup_interface()
+                            await cleanup_interface(self.interface)
                     finally:
                         self.worker = None
                         self.finished.set()
-
-    async def cleanup_interface(self):
-        if self.interface is None:
-            return
-        name, index = self.interface
-        try:
-            current_index = socket.if_nametoindex(name)
-        except OSError:
-            return
-        if current_index == index:
-            await trio.run_process(
-                ["iw", "dev", name, "del"],
-                capture_stdout=True, capture_stderr=True, check=False,
-            )
 
     async def stop(self):
         if self.worker is not None:
@@ -325,9 +320,51 @@ async def serve(phy, port):
     await trio.serve_tcp(handle, port, host="127.0.0.1")
 
 
+async def cleanup_interface(interface):
+    if interface is None:
+        return
+    name, index = interface
+    try:
+        current_index = socket.if_nametoindex(name)
+    except OSError:
+        return
+    if current_index == index:
+        await trio.run_process(
+            ["iw", "dev", name, "del"],
+            capture_stdout=True, capture_stderr=True, check=False,
+        )
+
+
+async def probe(phy):
+    interface = None
+
+    def ready(name, index):
+        nonlocal interface
+        interface = (name, index)
+        print(f"Monitor interface ready on {phy}; scanning for local GameShare", flush=True)
+
+    async def found(_frame, channel):
+        print(f"Received a GameShare advertisement on channel {channel}")
+        return True
+
+    try:
+        with trio.move_on_after(20) as timeout:
+            await scan_radio(phy, SCAN_CHANNELS, 0.2, found, ready)
+        if timeout.cancelled_caught:
+            print("No GameShare advertisement received within 20 seconds", file=sys.stderr)
+            return 1
+        return 0
+    finally:
+        with trio.move_on_after(3, shield=True):
+            await cleanup_interface(interface)
+
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--phy", required=True, help="Dedicated Linux wireless PHY, e.g. phy1")
     parser.add_argument("--port", type=int, default=32990)
+    parser.add_argument("--probe", action="store_true", help="Check discovery without joining or using keys")
     args = parser.parse_args()
+    if args.probe:
+        sys.exit(trio.run(probe, args.phy))
     trio.run(serve, args.phy, args.port)

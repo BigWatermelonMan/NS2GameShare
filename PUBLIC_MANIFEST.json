@@ -38,15 +38,15 @@
     },
     {
       "path": "bridge-linux/README.md",
-      "sha256": "0517f9a39a7481d598528662c8acbf99af88fa51fdb0d09fccc6a735694c9c50"
+      "sha256": "f621c75379ebda236c14bcc8cc94df144aea3c643483c0946b6358c7894615c0"
     },
     {
       "path": "bridge-linux/bridge.py",
-      "sha256": "66d4da87e376fc405ba66262e93c8a93e65350da88b3581601a2b3845afa9536"
+      "sha256": "b037ef40465bb79ed436a8dd41aca229b4abd57149202e2114f050760b58782e"
     },
     {
       "path": "bridge-linux/test_bridge.py",
-      "sha256": "a531bbec8e18daf842dd56251f2fde11301381ccef4480cc46be4fe04b992faf"
+      "sha256": "5b5e8c2ec24fa4cdc014724e245d6112e27de87cdd95c206685f926f5a8c5976"
     },
     {
       "path": "client-windows/Cargo.lock",

@@ -2,7 +2,7 @@
 """Hardware-free tests for the client-facing bridge protocol."""
 
 import struct
-from contextlib import aclosing
+from contextlib import aclosing, asynccontextmanager, nullcontext
 import sys
 import types
 import unittest
@@ -77,3 +77,43 @@ class WireTests(unittest.TestCase):
         self.assertFalse(bridge.advertisement(frame[:-1]))
         frame[43] = 0x4e
         self.assertFalse(bridge.advertisement(frame))
+
+    def test_probe_uses_radiotap_channel_and_strips_fcs(self):
+        frame = bytearray(92)
+        frame[0] = 0xd0
+        frame[24:29] = b"\x7f\x00\x22\xaa\x04"
+        frame[30:32] = b"\x01\x01"
+        frame[43] = 0x4d
+
+        class Monitor:
+            _socket = nullcontext()
+
+            def name(self):
+                return "nsgsmon"
+
+            def index(self):
+                return 1
+
+            async def set_channel(self, channel):
+                if channel == 36:
+                    raise OSError("channel unavailable")
+
+            async def recv(self):
+                return types.SimpleNamespace(frequency=2437, flags=0x10, data=frame + bytes(4))
+
+        @asynccontextmanager
+        async def create_monitor(_phy, _name):
+            yield Monitor()
+
+        @asynccontextmanager
+        async def factory():
+            yield types.SimpleNamespace(create_monitor=create_monitor)
+
+        async def found(data, channel):
+            self.assertEqual((data, channel), (frame, 6))
+            return True
+
+        with patch.object(bridge.wlan, "create_factory", factory, create=True), patch.object(
+            bridge.wlan, "Frequencies", {2437: 6}, create=True
+        ):
+            trio.run(bridge.scan_radio, "phy0", (36, 1), 0.2, found, lambda *_: None)

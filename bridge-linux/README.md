@@ -30,6 +30,31 @@ requires privileges to create wireless interfaces and open raw sockets. It
 listens on IPv4 loopback only and accepts one client. Run it on a machine where
 you trust local users with access to that port.
 
+### Check a laptop's built-in Wi-Fi
+
+The PHY can be the built-in adapter. With Linux booted directly on the laptop,
+start a local GameShare session on Switch 2 and run the discovery probe before
+starting the bridge server.
+
+```sh
+sudo ~/nsgs-bridge-venv/bin/python bridge-linux/bridge.py --phy phy0 --probe
+```
+
+Use the PHY reported by `iw dev`. This check needs only the laptop and the
+Switch 2. It listens for 20 seconds without joining the session or using keys.
+Receiving an advertisement confirms discovery on that adapter. To test the
+next stages on the same laptop, start the server and run the Rust client's
+`connect` command under Linux using its loopback port.
+
+```sh
+cargo run --release --locked --manifest-path client-windows/Cargo.toml -- connect \
+  --port tcp:32990 --keys /path/to/prod.keys \
+  --passphrase-file /path/to/gameshare-passphrase.bin --request-session
+```
+
+This command tests association, authentication and media packet receipt. The
+playable `play` frontend currently requires Windows.
+
 From Windows, open the tunnel and leave it running.
 
 ```powershell
