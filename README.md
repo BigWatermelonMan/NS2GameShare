@@ -17,7 +17,7 @@ This is an independent project and is not affiliated with Nintendo.
 | ESP32 + FX2LP | M5Stack Basic and FX2LP, connected using the [wiring guide](firmware-basic/README.md) |
 | ESP32 (Native USB) | ESP32-C5 with native USB; lower USB bandwidth |
 
-Use the firmware for your specific board. Other ESP32 boards, ordinary USB Wi-Fi adapters and Android are not supported.
+Use the firmware for your specific board. Other ESP32 boards require porting.
 You also need your own `prod.keys` and GameShare passphrase; neither is included.
 See [passphrase extraction](docs/PASSPHRASE.md) for supported sources.
 
@@ -40,6 +40,13 @@ See [settings and default controls](client-windows/README.md) and [controller an
 - Mouse gyro is experimental and has not been verified in gameplay.
 - Requested resolution depends on the host. End-to-end latency has not been measured.
 - Host-signature verification is not implemented. Connect only to a trusted host.
+
+## TODO
+
+- [ ] USB Wi-Fi dongle support as an alternative to the ESP32 bridge.
+- [ ] Android client.
+
+These features are planned and are not implemented yet.
 
 ## For developers
 
