@@ -185,9 +185,11 @@ impl Decoder {
                         if self.float_output {
                             ensure!(pcm.len().is_multiple_of(8), "unaligned stereo float PCM");
                             let converted = pcm
-                                .chunks_exact(4)
+                                .as_chunks::<4>()
+                                .0
+                                .iter()
                                 .flat_map(|v| {
-                                    let f = f32::from_le_bytes(v.try_into().unwrap());
+                                    let f = f32::from_le_bytes(*v);
                                     let v = if f.is_finite() {
                                         (f.clamp(-1.0, 1.0) * 32767.0).round() as i16
                                     } else {

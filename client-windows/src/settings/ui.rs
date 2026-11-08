@@ -99,13 +99,13 @@ fn theme(ctx: &egui::Context, dark: bool) {
     style.visuals.extreme_bg_color = p.input;
     style.visuals.faint_bg_color = p.input;
     style.visuals.selection.bg_fill = p.accent;
-    style.visuals.selection.stroke = Stroke::new(1.0, Color32::WHITE);
+    style.visuals.selection.stroke = Stroke::new(1.0_f32, Color32::WHITE);
     style.visuals.widgets.inactive.bg_fill = p.input;
     style.visuals.widgets.inactive.weak_bg_fill = p.input;
-    style.visuals.widgets.inactive.bg_stroke = Stroke::new(1.0, p.border);
+    style.visuals.widgets.inactive.bg_stroke = Stroke::new(1.0_f32, p.border);
     style.visuals.widgets.hovered.bg_fill = p.tint;
     style.visuals.widgets.hovered.weak_bg_fill = p.tint;
-    style.visuals.widgets.hovered.bg_stroke = Stroke::new(1.0, p.accent);
+    style.visuals.widgets.hovered.bg_stroke = Stroke::new(1.0_f32, p.accent);
     style.visuals.widgets.active.bg_fill = p.tint;
     style.visuals.widgets.active.weak_bg_fill = p.tint;
     for widget in [
@@ -222,7 +222,7 @@ fn card(
 ) {
     egui::Frame::new()
         .fill(p.card)
-        .stroke(Stroke::new(1.0, p.border))
+        .stroke(Stroke::new(1.0_f32, p.border))
         .corner_radius(12)
         .inner_margin(22)
         .show(ui, |ui| {
@@ -712,7 +712,7 @@ impl App {
         };
         egui::Frame::new()
             .fill(self.palette.card)
-            .stroke(Stroke::new(1.0, self.palette.border))
+            .stroke(Stroke::new(1.0_f32, self.palette.border))
             .corner_radius(18)
             .inner_margin(egui::Margin::symmetric(12, 7))
             .show(ui, |ui| {
@@ -747,11 +747,11 @@ impl App {
                     let c = rect.min + egui::vec2(24.0, 24.0);
                     let d = rect.min + egui::vec2(24.0, 10.0);
                     ui.painter()
-                        .line_segment([a, b], Stroke::new(2.3, Color32::WHITE));
+                        .line_segment([a, b], Stroke::new(2.3_f32, Color32::WHITE));
                     ui.painter()
-                        .line_segment([b, c], Stroke::new(2.3, Color32::WHITE));
+                        .line_segment([b, c], Stroke::new(2.3_f32, Color32::WHITE));
                     ui.painter()
-                        .line_segment([c, d], Stroke::new(2.3, Color32::WHITE));
+                        .line_segment([c, d], Stroke::new(2.3_f32, Color32::WHITE));
                     ui.vertical(|ui| {
                         ui.label(
                             RichText::new("NS2GameShare")
@@ -949,7 +949,7 @@ impl App {
                 egui::Frame::new()
                     .fill(self.palette.card)
                     .inner_margin(egui::Margin::symmetric(28, 16))
-                    .stroke(Stroke::new(1.0, self.palette.border)),
+                    .stroke(Stroke::new(1.0_f32, self.palette.border)),
             )
             .show(ctx, |ui| {
                 if ui.available_width() < 600.0 {
@@ -2040,7 +2040,7 @@ impl App {
                                     p.muted
                                 }))
                                 .fill(if on { p.accent } else { p.input })
-                                .stroke(Stroke::new(1.0, if on { p.accent } else { p.border }))
+                                .stroke(Stroke::new(1.0_f32, if on { p.accent } else { p.border }))
                                 .sense(egui::Sense::hover()),
                             );
                             if i % count == count - 1 {
@@ -2092,24 +2092,24 @@ fn stick(ui: &mut egui::Ui, p: Palette, label: &str, x: f32, y: f32) {
         let center = rect.center();
         let radius = 67.0;
         let painter = ui.painter();
-        painter.circle(center, radius, p.input, Stroke::new(1.0, p.border));
-        painter.circle_stroke(center, radius * 0.2, Stroke::new(1.0, p.border));
+        painter.circle(center, radius, p.input, Stroke::new(1.0_f32, p.border));
+        painter.circle_stroke(center, radius * 0.2, Stroke::new(1.0_f32, p.border));
         painter.line_segment(
             [
                 center - egui::vec2(radius, 0.0),
                 center + egui::vec2(radius, 0.0),
             ],
-            Stroke::new(1.0, p.border),
+            Stroke::new(1.0_f32, p.border),
         );
         painter.line_segment(
             [
                 center - egui::vec2(0.0, radius),
                 center + egui::vec2(0.0, radius),
             ],
-            Stroke::new(1.0, p.border),
+            Stroke::new(1.0_f32, p.border),
         );
         let point = center + egui::vec2(x, -y) * radius;
-        painter.line_segment([center, point], Stroke::new(2.0, p.accent));
+        painter.line_segment([center, point], Stroke::new(2.0_f32, p.accent));
         painter.circle_filled(point, 8.0, p.accent);
         ui.label(
             RichText::new(format!("X {x:+.2}   Y {y:+.2}"))

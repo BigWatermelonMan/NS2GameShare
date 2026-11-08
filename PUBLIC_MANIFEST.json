@@ -6,7 +6,7 @@
     },
     {
       "path": ".github/workflows/check.yml",
-      "sha256": "26274b372ca56f5a6ea8cbb5979ceffbf265dff5158c0cd26c553d1ca2d405cf"
+      "sha256": "fb575d5e8800fcb7aea1c183d8d364431351b21fb5585b818b8991efa0d6f8a1"
     },
     {
       "path": ".gitignore",
@@ -54,7 +54,7 @@
     },
     {
       "path": "client-windows/src/audio.rs",
-      "sha256": "b235e002017f44ac4bc87dca47bd78513ca8f521fa4f4ea7b3b3055bd6f15687"
+      "sha256": "ae13776312d5d3ac9f4650fd1b921d555e2401f907a3d2b83e8171b64cd7e0bd"
     },
     {
       "path": "client-windows/src/binding.rs",
@@ -106,7 +106,7 @@
     },
     {
       "path": "client-windows/src/ldn.rs",
-      "sha256": "ead88f70094a01e3824b617f4a417a0ceb2bb2d28dd90e7b5056377e55a9152d"
+      "sha256": "c2f39512c4b6fbee1f89cb2228517afcbaee3e62f86b73818b850f941f34eb47"
     },
     {
       "path": "client-windows/src/lib.rs",
@@ -130,7 +130,7 @@
     },
     {
       "path": "client-windows/src/mouse.rs",
-      "sha256": "29918f252c1e075543670dea19310b0bfde0a7fd362139bb634bdf5144582d95"
+      "sha256": "5b3afcf44ed9d916ff5db91bb3c115a8f426e7749577138f114d265b3b9076e0"
     },
     {
       "path": "client-windows/src/net.rs",
@@ -138,7 +138,7 @@
     },
     {
       "path": "client-windows/src/passphrase.rs",
-      "sha256": "d1c8cbccbc4301d13102b3bdce3736eae345c72724afeaf3161f56ece4820fe9"
+      "sha256": "2c467933e1245d7d9314bf9f446e92fadb25eca55e91510482ddd6e991f15ae1"
     },
     {
       "path": "client-windows/src/pcap.rs",
@@ -170,7 +170,7 @@
     },
     {
       "path": "client-windows/src/settings/ui.rs",
-      "sha256": "5525f91d65f96e29adb34773018c55bd511bfafa367cb70cf12228e72659e009"
+      "sha256": "cd7caa43dae6411c0e3ba6e1a97de05d53523344f35a8582e959ef73aa9fab5e"
     },
     {
       "path": "client-windows/src/timeline.rs",

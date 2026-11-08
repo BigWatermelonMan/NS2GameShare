@@ -103,12 +103,20 @@ pub fn raw(handle: HRAWINPUT) {
         if m.usFlags.0 & MOUSE_MOVE_ABSOLUTE.0 != 0 {
             return;
         }
-        let _ = DX.fetch_update(Ordering::Relaxed, Ordering::Relaxed, |n| {
-            Some(n.saturating_add(m.lLastX).clamp(-16384, 16384))
-        });
-        let _ = DY.fetch_update(Ordering::Relaxed, Ordering::Relaxed, |n| {
-            Some(n.saturating_add(m.lLastY).clamp(-16384, 16384))
-        });
+        accumulate(&DX, m.lLastX);
+        accumulate(&DY, m.lLastY);
+    }
+}
+fn accumulate(counter: &AtomicI32, delta: i32) {
+    // Keep the supported MSRV without the deprecated fetch_update API.
+    // A concurrent sampler swap must cause a retry, not lose the new delta.
+    let mut previous = counter.load(Ordering::Relaxed);
+    loop {
+        let next = previous.saturating_add(delta).clamp(-16384, 16384);
+        match counter.compare_exchange_weak(previous, next, Ordering::Relaxed, Ordering::Relaxed) {
+            Ok(_) => return,
+            Err(current) => previous = current,
+        }
     }
 }
 pub struct Filter {
@@ -121,6 +129,7 @@ pub struct Filter {
     sensitivity: f32,
     smoothing_ms: f32,
 }
+
 impl Filter {
     pub fn new(sensitivity: f32, smoothing_ms: f32) -> Self {
         Self {
@@ -187,5 +196,42 @@ impl Filter {
                 state.buttons |= 1 << bit;
             }
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    #[test]
+    fn bounded_counts_survive_concurrent_sampling() {
+        let counter = AtomicI32::new(0);
+        accumulate(&counter, i32::MAX);
+        assert_eq!(counter.load(Ordering::Relaxed), 16384);
+        accumulate(&counter, -1);
+        assert_eq!(counter.swap(0, Ordering::Relaxed), 16383);
+        accumulate(&counter, i32::MIN);
+        assert_eq!(counter.swap(0, Ordering::Relaxed), -16384);
+
+        let finished = std::sync::atomic::AtomicUsize::new(0);
+        let barrier = std::sync::Barrier::new(5);
+        let total = std::thread::scope(|scope| {
+            for _ in 0..4 {
+                scope.spawn(|| {
+                    barrier.wait();
+                    for _ in 0..1000 {
+                        accumulate(&counter, 1);
+                    }
+                    finished.fetch_add(1, Ordering::Release);
+                });
+            }
+            barrier.wait();
+            let mut total = 0;
+            while finished.load(Ordering::Acquire) < 4 {
+                total += counter.swap(0, Ordering::Relaxed);
+                std::thread::yield_now();
+            }
+            total + counter.swap(0, Ordering::Relaxed)
+        });
+        assert_eq!(total, 4000);
     }
 }

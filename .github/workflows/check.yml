@@ -13,6 +13,10 @@ jobs:
       - uses: dtolnay/rust-toolchain@stable
         with:
           components: rustfmt, clippy
+      - name: Show toolchain versions
+        run: |
+          rustc --version
+          cargo clippy --version
       - run: python -B tools/release/audit_public.py .
       - run: python -B -m unittest discover -s tools/release -p "test_*.py"
       - run: cargo fmt --manifest-path client-windows/Cargo.toml -- --check

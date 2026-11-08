@@ -21,7 +21,9 @@ pub fn hex(b: &[u8]) -> String {
 pub fn unhex(s: &str) -> Result<Vec<u8>> {
     ensure!(s.len().is_multiple_of(2), "invalid hex length");
     s.as_bytes()
-        .chunks_exact(2)
+        .as_chunks::<2>()
+        .0
+        .iter()
         .map(|b| Ok(u8::from_str_radix(std::str::from_utf8(b)?, 16)?))
         .collect()
 }
@@ -137,7 +139,7 @@ impl Host {
         let n = d[39] as usize;
         ensure!(n <= 8 && d.len() >= 42 + 48 * n, "invalid participant list");
         let mut nodes = Vec::new();
-        for rec in d[40..40 + n * 48].chunks_exact(48) {
+        for rec in d[40..40 + n * 48].as_chunks::<48>().0 {
             nodes.push((rec[4..10].try_into()?, rec[..4].try_into()?));
         }
         let off = 40 + n * 48;

@@ -74,10 +74,10 @@ fn xts_header(data: &[u8], key: &[u8; 32]) -> Result<Vec<u8>> {
     let cipher = Aes128::new_from_slice(&key[..16])?;
     let tweak_cipher = Aes128::new_from_slice(&key[16..])?;
     let mut out = data.to_vec();
-    for (index, sector) in out.chunks_exact_mut(512).enumerate() {
+    for (index, sector) in out.as_chunks_mut::<512>().0.iter_mut().enumerate() {
         let mut tweak = (index as u128).to_be_bytes().into();
         tweak_cipher.encrypt_block(&mut tweak);
-        for block in sector.chunks_exact_mut(16) {
+        for block in sector.as_chunks_mut::<16>().0 {
             let mut value = [0; 16];
             for i in 0..16 {
                 value[i] = block[i] ^ tweak[i];
