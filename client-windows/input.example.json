@@ -1,0 +1,79 @@
+{
+  "directinput": {
+    "device": null,
+    "buttons": null,
+    "axes": [
+      0,
+      1,
+      2,
+      5
+    ],
+    "invert": [
+      false,
+      true,
+      false,
+      true
+    ],
+    "deadzone": 0.15,
+    "enabled": true,
+    "pov_buttons": [
+      12,
+      13,
+      14,
+      15
+    ]
+  },
+  "mouse_sensitivity": 0.025,
+  "mouse_smoothing_ms": 8.0,
+  "keyboard": {
+    "buttons": [
+      88,
+      90,
+      83,
+      65,
+      null,
+      null,
+      81,
+      87,
+      49,
+      50,
+      13,
+      8,
+      37,
+      38,
+      39,
+      40
+    ],
+    "left_stick": [
+      37,
+      38,
+      39,
+      40
+    ]
+  },
+  "xinput_enabled": true,
+  "xinput_index": null,
+  "xinput_deadzone": [
+    0.23953978087710195,
+    0.2651753288369396
+  ],
+  "xinput_buttons": null,
+  "mouse_enabled": true,
+  "mouse_capture_key": 119,
+  "mouse_buttons": [
+    9,
+    8,
+    5,
+    6,
+    7
+  ],
+  "mouse_mode": "right_stick",
+  "mouse_gyro": {
+    "yaw_counts_per_turn": 8000.0,
+    "pitch_counts_per_turn": 8000.0,
+    "pitch_limit_deg": 80.0,
+    "invert_yaw": false,
+    "invert_pitch": false,
+    "reset_key": 118
+  }
+}

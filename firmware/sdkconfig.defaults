@@ -1,0 +1,14 @@
+CONFIG_IDF_TARGET="esp32c5"
+
+# Both serial ports carry the binary capture stream, so nothing else may print on them.
+CONFIG_ESP_CONSOLE_NONE=y
+CONFIG_BOOTLOADER_LOG_LEVEL_WARN=y
+CONFIG_LOG_DEFAULT_LEVEL_WARN=y
+
+CONFIG_ESP_DEFAULT_CPU_FREQ_MHZ_240=y
+CONFIG_FREERTOS_HZ=1000
+
+# More RX buffers so bursts are not dropped inside the Wi-Fi driver.
+CONFIG_ESP_WIFI_STATIC_RX_BUFFER_NUM=16
+CONFIG_ESP_WIFI_DYNAMIC_RX_BUFFER_NUM=64
+CONFIG_ESP_WIFI_NVS_ENABLED=n

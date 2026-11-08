@@ -1,0 +1,20 @@
+name: Source checks
+on: [push, pull_request]
+permissions:
+  contents: read
+jobs:
+  windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: rustfmt, clippy
+      - run: python -B tools/release/audit_public.py .
+      - run: python -B -m unittest discover -s tools/release -p "test_*.py"
+      - run: cargo fmt --manifest-path client-windows/Cargo.toml -- --check
+      - run: cargo test --locked --manifest-path client-windows/Cargo.toml
+      - run: cargo clippy --locked --manifest-path client-windows/Cargo.toml --all-targets -- -D warnings

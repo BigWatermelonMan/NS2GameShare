@@ -1,0 +1,6 @@
+cmake_minimum_required(VERSION 3.16)
+include($ENV{IDF_PATH}/tools/cmake/project.cmake)
+idf_build_set_property(MINIMAL_BUILD ON)
+idf_build_set_property(LINK_OPTIONS "-Wl,--wrap=ieee80211_crypto_encap" APPEND)
+idf_build_set_property(LINK_OPTIONS "-Wl,--wrap=ieee80211_ccmp_encrypt" APPEND)
+project(basic_gameshare)

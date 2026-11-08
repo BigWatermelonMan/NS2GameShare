@@ -1,0 +1,34 @@
+menu "C5 Sniffer"
+
+    config SNIFFER_USE_USB_JTAG
+        bool "Accept host on the native USB port (USB-Serial-JTAG)"
+        default y
+        help
+            The board's native USB port (the one wired straight to the chip).
+            Fastest link; the baud rate setting on the PC side is ignored.
+
+    config SNIFFER_USE_UART
+        bool "Accept host on UART0 (USB-UART bridge port)"
+        default y
+
+    config SNIFFER_UART_BAUD
+        int "UART0 baud rate"
+        depends on SNIFFER_USE_UART
+        default 2000000
+        help
+            Must match --baud on the PC side. 2000000 works with CP210x,
+            CH34x and FTDI bridges.
+
+    config SNIFFER_RINGBUF_SIZE
+        int "Capture ring buffer size (bytes)"
+        default 65536
+
+    config SNIFFER_COUNTRY
+        string "Wi-Fi country code (decides which channels may be tuned)"
+        default "JP"
+
+    config SNIFFER_DEFAULT_CHANNEL
+        int "Channel tuned at boot"
+        default 1
+
+endmenu

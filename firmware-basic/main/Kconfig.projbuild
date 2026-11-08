@@ -1,0 +1,52 @@
+rsource "../../firmware/main/Kconfig.projbuild"
+menu "Basic FX2LP link"
+config BASIC_FX2
+    bool "Enable parallel IN and FX2 software-UART return link"
+    default y
+config BASIC_FX2_TRACE
+    bool "Temporary bounded UART0 trace between FIFO transactions"
+    default n
+    help
+        Diagnostic only. GPIO1 is restored to DMA before each transfer.
+        Disable for gameplay to avoid sending trace bytes to the USB-UART.
+config BASIC_FX2_D0
+    int "FD0 GPIO"
+    default 16
+config BASIC_FX2_D1
+    int "FD1 GPIO"
+    default 17
+config BASIC_FX2_D2
+    int "FD2 GPIO"
+    default 18
+config BASIC_FX2_D3
+    int "FD3 GPIO"
+    default 19
+config BASIC_FX2_D4
+    int "FD4 GPIO"
+    default 23
+config BASIC_FX2_D5
+    int "FD5 GPIO"
+    default 26
+config BASIC_FX2_D6
+    int "FD6 GPIO"
+    default 2
+config BASIC_FX2_D7
+    int "FD7 GPIO"
+    default 1
+    help
+        GPIO1 is exposed as TX/TXD0 on the Basic base. UART0 application
+        transport must be disabled when this pin carries parallel data.
+config BASIC_FX2_WR
+    int "SLWR GPIO"
+    default 5
+config BASIC_FX2_SPACE
+    int "EP6 not-full flag input GPIO"
+    default 35
+config BASIC_FX2_RX
+    int "FX2 PA0 UART return GPIO"
+    default 36
+config BASIC_FX2_CLOCK_HZ
+    int "Parallel byte clock"
+    range 100000 4000000
+    default 1000000
+endmenu
